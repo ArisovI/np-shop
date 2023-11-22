@@ -5,13 +5,18 @@ export type UsersState = {
 };
 
 export type UsersItem = {
-  id: number;
+  id?: number;
   email: string;
   password: string;
   name: string;
-  role: string;
+  role?: string;
   avatar: string;
   key?: number;
+};
+
+export type UpdateItem = {
+  email: string;
+  name: string;
 };
 
 export type ProductsState = {

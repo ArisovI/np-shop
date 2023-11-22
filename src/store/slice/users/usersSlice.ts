@@ -1,5 +1,5 @@
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
-import { getUsers } from "./async";
+import { createUser, getUsers, updateUser } from "./async";
 import { UsersState } from "../../../types";
 
 const initialState: UsersState = {
@@ -14,6 +14,7 @@ const usersSlice = createSlice({
   reducers: {},
   extraReducers(builder) {
     builder
+      //get users
       .addCase(getUsers.pending, (state) => {
         state.isLoading = true;
       })
@@ -24,6 +25,25 @@ const usersSlice = createSlice({
       .addCase(getUsers.rejected, (state, action) => {
         state.isLoading = false;
         state.isError = action.payload;
+      })
+      //create
+      .addCase(createUser.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(createUser.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.users.push(action.payload);
+      })
+      .addCase(createUser.rejected, (state, action) => {
+        state.isLoading = false;
+        state.isError = action.payload;
+      })
+      //update
+      .addCase(updateUser.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(updateUser.fulfilled, (state, payload) => {
+        state.isLoading = false;
       });
   },
 });
