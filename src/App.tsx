@@ -1,20 +1,12 @@
-import Admin from "./pages/admin";
 import { Route, Routes } from "react-router-dom";
 
+import Admin from "./pages/admin";
 import { Home } from "./pages/home";
 import { Users } from "./pages/users";
 import { Products } from "./pages/products";
 import { Categories } from "./pages/categories";
-import { useAppDispatch } from "./store/hoc";
-import { useEffect } from "react";
-import { getUsers } from "./store/slice/users/async";
 
 const App = () => {
-  const dispatch = useAppDispatch();
-
-  useEffect(() => {
-    dispatch(getUsers())
-  },)
   return (
     <>
       <Routes>
@@ -29,4 +21,4 @@ const App = () => {
   );
 };
 
-export default App;
+export { App };
