@@ -45,9 +45,27 @@ export const updateUser = createAsyncThunk<
 >("users/updateUser", async (user, { rejectWithValue }) => {
   try {
     const response = await axios.put(
-      `https://api.escuelajs.co/api/v1/users/${user.id}`
+      `https://api.escuelajs.co/api/v1/users/${user.id}`,
+      user
     );
-    console.log(response);
+    if (response.status !== 200) return [];
+
+    return response.data;
+  } catch (e) {
+    const error = e as Error;
+    return rejectWithValue(error.message);
+  }
+});
+
+export const deleteUser = createAsyncThunk<
+  boolean,
+  number | undefined,
+  { rejectValue: string }
+>("users/deleteUser", async (id, { rejectWithValue }) => {
+  try {
+    const response = await axios.delete(
+      `https://api.escuelajs.co/api/v1/users/${id}`
+    );
     if (response.status !== 200) return [];
 
     return response.data;

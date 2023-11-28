@@ -1,5 +1,5 @@
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
-import { createUser, getUsers, updateUser } from "./async";
+import { createUser, deleteUser, getUsers, updateUser } from "./async";
 import { UsersState } from "../../../types";
 
 const initialState: UsersState = {
@@ -42,8 +42,32 @@ const usersSlice = createSlice({
       .addCase(updateUser.pending, (state) => {
         state.isLoading = true;
       })
-      .addCase(updateUser.fulfilled, (state, payload) => {
+      .addCase(updateUser.fulfilled, (state, action) => {
         state.isLoading = false;
+        // state.users = [
+        //   ...state.users.filter((user) => user.id !== action.payload.id),
+        //   action.payload,
+        // ];
+        state.users = state.users.map((user) =>
+          user.id === action.payload.id ? action.payload : user
+        );
+      })
+      .addCase(updateUser.rejected, (state, action) => {
+        state.isLoading = false;
+        state.isError = action.payload;
+      })
+
+      //delete
+      .addCase(deleteUser.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(deleteUser.fulfilled, (state, action) => {
+        state.isLoading = false;
+        // state.users = state.users.filter((user) => user.id !== action.payload.id)
+      })
+      .addCase(deleteUser.rejected, (state, action) => {
+        state.isLoading = false;
+        state.isError = action.payload;
       });
   },
 });

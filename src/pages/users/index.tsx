@@ -4,6 +4,7 @@ import Column from "antd/es/table/Column";
 import { useAppDispatch, useAppSelector } from "../../store/hoc";
 import {
   createUser,
+  deleteUser,
   getUsers,
   updateUser,
 } from "../../store/slice/users/async";
@@ -17,39 +18,54 @@ const Users = () => {
   const [isModalOpen, setIsModalOpen] = useState<boolean | undefined>(false);
   const { beforeUpload, handleChange, imageUrl, uploadButton, setImageUrl } =
     useAvatar();
+
   const [newUser, setNewUser] = useState<UsersItem>({
     name: "",
     email: "",
     password: "",
     avatar: "",
   });
+
   const showModal = () => {
     setIsModalOpen(true);
   };
+
   const handleCancel = () => {
     setIsModalOpen(false);
   };
+
   const onSubmit = async () => {
     await dispatch(createUser(newUser));
+    setNewUser({
+      name: "",
+      email: "",
+      password: "",
+      avatar: "",
+    });
     setTimeout(() => {
       setIsModalOpen(false);
     }, 1000);
+
+    console.log(newUser);
   };
 
   const editUser = (record: UsersItem) => {
-    dispatch(updateUser(record));
-    setIsModalOpen(true);
-
-    const item = users.find((user) => user.id === record.id);
+    const item = users.find((user: UsersItem) => user.id === record.id);
+    // dispatch(updateUser(record));
     if (item !== undefined) {
+      console.log(item);
       setNewUser(item);
+      setIsModalOpen(true);
     }
-    console.log(newUser);
+  };
+
+  const delUser = (id: number | undefined) => {
+    dispatch(deleteUser(id));
   };
 
   useEffect(() => {
     dispatch(getUsers());
-  }, []);
+  }, [dispatch, newUser]);
 
   return (
     <div className="flex flex-col gap-5">
@@ -89,16 +105,15 @@ const Users = () => {
             render={(_, record: UsersItem) => (
               <div className="flex gap-3">
                 <Button onClick={() => editUser(record)}>Edit</Button>
-                <Button>Delete</Button>
+                <Button onClick={() => delUser(record.id)}>Delete</Button>
               </div>
             )}
           />
         </Table>
       </div>
-
       <Modal open={isModalOpen} onCancel={handleCancel} footer={null}>
         <Form onFinish={onSubmit}>
-          <Form.Item>
+          <Form.Item initialValue={newUser.avatar}>
             <Upload
               name="avatar"
               listType="picture-circle"
@@ -127,6 +142,7 @@ const Users = () => {
           <Form.Item
             label="Name"
             name="name"
+            initialValue={newUser.name}
             rules={[
               {
                 required: true,
@@ -136,16 +152,17 @@ const Users = () => {
             ]}
           >
             <Input
-              value={newUser.name}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                setNewUser((prev) => ({ ...prev, name: e.target.value }))
-              }
+            // value={newUser.name}
+            // onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+            //   setNewUser((prev) => ({ ...prev, name: e.target.value }))
+            // }
             />
           </Form.Item>
 
           <Form.Item
             label="Email"
             name="email"
+            initialValue={newUser.email}
             rules={[
               {
                 required: true,
@@ -154,17 +171,13 @@ const Users = () => {
               },
             ]}
           >
-            <Input
-              value={newUser.email}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                setNewUser((prev) => ({ ...prev, email: e.target.value }))
-              }
-            />
+            <Input />
           </Form.Item>
 
           <Form.Item
             label="Password"
             name="password"
+            initialValue={newUser.password}
             rules={[
               {
                 required: true,
@@ -172,12 +185,7 @@ const Users = () => {
               },
             ]}
           >
-            <Input.Password
-              value={newUser.password}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                setNewUser((prev) => ({ ...prev, password: e.target.value }))
-              }
-            />
+            <Input.Password />
           </Form.Item>
 
           <Form.Item
