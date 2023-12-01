@@ -1,5 +1,15 @@
 import React, { useEffect, useState } from "react";
-import { Avatar, Button, Form, Input, Modal, Table, Upload } from "antd";
+import {
+  Alert,
+  Avatar,
+  Button,
+  Form,
+  Input,
+  Modal,
+  Table,
+  Upload,
+  message,
+} from "antd";
 import Column from "antd/es/table/Column";
 import { useAppDispatch, useAppSelector } from "../../store/hoc";
 import {
@@ -10,68 +20,94 @@ import {
 } from "../../store/slice/users/async";
 import { useAvatar } from "../../hook/useAvatar";
 import { UsersItem } from "../../types";
+import { useForm } from "antd/es/form/Form";
 
 const Users = () => {
   const { users } = useAppSelector((state) => state.users);
+  const [messageApi, contextHolder] = message.useMessage();
+  const [createOrEdit, setCreateOrEdit] = useState(false);
+  const [userId, setUserId] = useState<number | undefined>(undefined);
+  const [form] = useForm();
   const dispatch = useAppDispatch();
-
   const [isModalOpen, setIsModalOpen] = useState<boolean | undefined>(false);
   const { beforeUpload, handleChange, imageUrl, uploadButton, setImageUrl } =
     useAvatar();
 
-  const [newUser, setNewUser] = useState<UsersItem>({
-    name: "",
-    email: "",
-    password: "",
-    avatar: "",
-  });
-
   const showModal = () => {
     setIsModalOpen(true);
+    setCreateOrEdit(true);
+    form.resetFields();
   };
 
   const handleCancel = () => {
     setIsModalOpen(false);
   };
 
-  const onSubmit = async () => {
-    await dispatch(createUser(newUser));
-    setNewUser({
-      name: "",
-      email: "",
-      password: "",
-      avatar: "",
+  const onSubmit = (user: UsersItem) => {
+    dispatch(createUser(user));
+    messageApi.open({
+      type: "success",
+      content: "You have created a new user",
+      duration: 2,
     });
     setTimeout(() => {
       setIsModalOpen(false);
     }, 1000);
-
-    console.log(newUser);
   };
 
   const editUser = (record: UsersItem) => {
-    const item = users.find((user: UsersItem) => user.id === record.id);
-    // dispatch(updateUser(record));
-    if (item !== undefined) {
-      console.log(item);
-      setNewUser(item);
+    setCreateOrEdit(false);
+    if (record !== undefined) {
+      form.setFieldsValue(record);
       setIsModalOpen(true);
+      setUserId(record.id);
     }
   };
 
+  const edit = () => {
+    const formItems = form.getFieldsValue();
+    const id = userId;
+    dispatch(updateUser({ ...formItems, id }));
+  };
+
   const delUser = (id: number | undefined) => {
-    dispatch(deleteUser(id));
+    if (id !== undefined) {
+      if (id > 3) {
+        dispatch(deleteUser(id));
+        messageApi.open({
+          type: "success",
+          content: "You deleted the user",
+          duration: 2,
+        });
+      } else {
+        messageApi.open({
+          type: "error",
+          content: "You can't delete this user",
+          duration: 2,
+        });
+      }
+    }
+  };
+
+  const resetData = () => {
+    setImageUrl("");
+    messageApi.open({
+      type: "success",
+      content: "You cleared the form",
+      duration: 2,
+    });
   };
 
   useEffect(() => {
     dispatch(getUsers());
-  }, [dispatch, newUser]);
+  }, []);
 
   return (
     <div className="flex flex-col gap-5">
+      {contextHolder}
       <Button
         className="w-[100px] ml-auto bg-blue-500 text-white text-base"
-        onClick={showModal}
+        onClick={() => showModal()}
       >
         New user
       </Button>
@@ -112,8 +148,8 @@ const Users = () => {
         </Table>
       </div>
       <Modal open={isModalOpen} onCancel={handleCancel} footer={null}>
-        <Form onFinish={onSubmit}>
-          <Form.Item initialValue={newUser.avatar}>
+        <Form onFinish={onSubmit} form={form}>
+          <Form.Item>
             <Upload
               name="avatar"
               listType="picture-circle"
@@ -142,7 +178,6 @@ const Users = () => {
           <Form.Item
             label="Name"
             name="name"
-            initialValue={newUser.name}
             rules={[
               {
                 required: true,
@@ -151,18 +186,12 @@ const Users = () => {
               },
             ]}
           >
-            <Input
-            // value={newUser.name}
-            // onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-            //   setNewUser((prev) => ({ ...prev, name: e.target.value }))
-            // }
-            />
+            <Input />
           </Form.Item>
 
           <Form.Item
             label="Email"
             name="email"
-            initialValue={newUser.email}
             rules={[
               {
                 required: true,
@@ -177,7 +206,6 @@ const Users = () => {
           <Form.Item
             label="Password"
             name="password"
-            initialValue={newUser.password}
             rules={[
               {
                 required: true,
@@ -214,8 +242,14 @@ const Users = () => {
 
           <Form.Item>
             <div className="flex justify-end gap-5">
-              <Button htmlType="submit">Submit</Button>
-              <Button htmlType="reset" onClick={() => setImageUrl("")}>
+              {createOrEdit ? (
+                <Button htmlType="submit">Submit</Button>
+              ) : (
+                <Button htmlType="button" onClick={() => edit()}>
+                  Edit
+                </Button>
+              )}
+              <Button htmlType="reset" onClick={() => resetData()}>
                 Reset
               </Button>
             </div>

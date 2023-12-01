@@ -46,13 +46,17 @@ export const updateUser = createAsyncThunk<
   try {
     const response = await axios.put(
       `https://api.escuelajs.co/api/v1/users/${user.id}`,
-      user
+      {
+        email: user.email,
+        name: user.name,
+      }
     );
-    if (response.status !== 200) return [];
-
+if (response.status !== 200) return [];
+    console.log(response.data);
     return response.data;
   } catch (e) {
     const error = e as Error;
+    console.log(error.message);
     return rejectWithValue(error.message);
   }
 });
