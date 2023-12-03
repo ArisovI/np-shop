@@ -69,7 +69,6 @@ const Admin = () => {
             theme="dark"
             mode="inline"
             selectedKeys={[selectedLink?.key ? selectedLink.key : "1"]}
-            // defaultSelectedKeys={["1"]}
             items={links}
           />
         </Sider>
