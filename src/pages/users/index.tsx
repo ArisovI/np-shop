@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import {
-  Alert,
   Avatar,
   Button,
   Form,
@@ -23,7 +22,7 @@ import { UsersItem } from "../../types";
 import { useForm } from "antd/es/form/Form";
 
 const Users = () => {
-  const { users } = useAppSelector((state) => state.users);
+  const { users, isError, isLoading } = useAppSelector((state) => state.users);
   const [messageApi, contextHolder] = message.useMessage();
   const [createOrEdit, setCreateOrEdit] = useState(false);
   const [userId, setUserId] = useState<number | undefined>(undefined);
@@ -76,6 +75,28 @@ const Users = () => {
     setTimeout(() => {
       setIsModalOpen(false);
     }, 1000);
+    if (id !== undefined) {
+      if (id > 3) {
+        dispatch(updateUser({ ...formItems, id }));
+        messageApi.open({
+          type: "success",
+          content: "You have successfully updated the user",
+          duration: 2,
+        });
+        setTimeout(() => {
+          setIsModalOpen(false);
+        }, 1000);
+      } else {
+        messageApi.open({
+          type: "error",
+          content: "You can't edit this user",
+          duration: 2,
+        });
+        setTimeout(() => {
+          setIsModalOpen(false);
+        }, 1000);
+      }
+    }
   };
 
   const delUser = (id: number | undefined) => {
@@ -106,9 +127,15 @@ const Users = () => {
     });
   };
 
-  useEffect(() => {
-    dispatch(getUsers());
-  }, [dispatch]);
+  // useEffect(() => {
+  //   dispatch(getUsers());
+  // }, [dispatch]);
+  //   return;
+  // }, []);
+
+  // if (isError) {
+  //   return <h1>ERROR</h1>;
+  // }
 
   return (
     <div className="flex flex-col gap-3">
@@ -125,6 +152,7 @@ const Users = () => {
           size="middle"
           bordered
           rowKey={(recond) => String(recond.id)}
+          loading={isLoading}
           pagination={{ showSizeChanger: false }}
         >
           <Column dataIndex="id" key="id" title="№" ellipsis />
@@ -267,6 +295,5 @@ const Users = () => {
       </Modal>
     </div>
   );
-};
 
-export { Users };
+export default Users 

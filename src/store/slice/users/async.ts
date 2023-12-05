@@ -51,7 +51,7 @@ export const updateUser = createAsyncThunk<
         name: user.name,
       }
     );
-if (response.status !== 200) return [];
+    if (response.status !== 200) return [];
     console.log(response.data);
     return response.data;
   } catch (e) {
