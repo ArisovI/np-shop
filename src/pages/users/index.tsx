@@ -68,6 +68,14 @@ const Users = () => {
     const formItems = form.getFieldsValue();
     const id = userId;
     dispatch(updateUser({ ...formItems, id }));
+    messageApi.open({
+      type: "success",
+      content: "You have successfully updated the user",
+      duration: 2,
+    });
+    setTimeout(() => {
+      setIsModalOpen(false);
+    }, 1000);
   };
 
   const delUser = (id: number | undefined) => {
@@ -100,10 +108,10 @@ const Users = () => {
 
   useEffect(() => {
     dispatch(getUsers());
-  }, []);
+  }, [dispatch]);
 
   return (
-    <div className="flex flex-col gap-5">
+    <div className="flex flex-col gap-3">
       {contextHolder}
       <Button
         className="w-[100px] ml-auto bg-blue-500 text-white text-base"
@@ -117,6 +125,7 @@ const Users = () => {
           size="middle"
           bordered
           rowKey={(recond) => String(recond.id)}
+          pagination={{ showSizeChanger: false }}
         >
           <Column dataIndex="id" key="id" title="№" ellipsis />
           <Column

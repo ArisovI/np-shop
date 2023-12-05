@@ -62,14 +62,13 @@ const Admin = () => {
             }`}
           >
             <HomeOutlined className="text-2xl" />
-            {collapsed ? "" : <h1 className="text-xl font-bold">Nicolas </h1>}
+            {collapsed ? "" : <h1 className="text-xl font-bold">Nicolas</h1>}
           </div>
 
           <Menu
             theme="dark"
             mode="inline"
             selectedKeys={[selectedLink?.key ? selectedLink.key : "1"]}
-            // defaultSelectedKeys={["1"]}
             items={links}
           />
         </Sider>
@@ -89,12 +88,12 @@ const Admin = () => {
           <Content
             style={{
               margin: "24px 16px",
-              padding: 24,
+              padding: '10px 15px',
               minHeight: 280,
               background: colorBgContainer,
             }}
           >
-            <div>
+            <div >
               <Outlet />
             </div>
           </Content>
