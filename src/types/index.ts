@@ -1,3 +1,4 @@
+import { UploadFile } from "antd";
 export type UsersState = {
   users: UsersItem[];
   isLoading: boolean;
@@ -30,12 +31,20 @@ export type ProductsItem = {
   title: string;
   price: number;
   description: string;
-  category: {
+  category?: {
     id: number;
     name: string;
     image: string;
   };
-  images: string[];
+  images: string[] | UploadFile[];
+};
+
+export type ProductsItemCreate = {
+  categoryId: number;
+  title: string;
+  price: number;
+  description: string;
+  images: string[] | UploadFile[];
 };
 
 export type CategoriesState = {

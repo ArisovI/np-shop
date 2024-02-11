@@ -1,9 +1,5 @@
-import React from 'react'
-
 const Categories = () => {
-    return (
-        <div>Categories</div>
-    )
-}
+  return <div>category</div>;
+};
 
-export { Categories }
+export { Categories };

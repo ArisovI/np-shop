@@ -1,16 +1,15 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
-import { UpdateItem, UsersItem } from "../../../types/index";
+import { UsersItem } from "../../../types/index";
 
 export const getUsers = createAsyncThunk<
   UsersItem[],
   void,
   { rejectValue: string }
->("users/getUsers", async (_, { rejectWithValue, dispatch }) => {
+>("users/getUsers", async (_, { rejectWithValue }) => {
   try {
     const response = await axios.get("https://api.escuelajs.co/api/v1/users");
     if (response.status !== 200) return [];
-    dispatch(getUsers());
     return response.data;
   } catch (e) {
     const error = e as Error;
@@ -22,7 +21,7 @@ export const createUser = createAsyncThunk<
   UsersItem,
   UsersItem,
   { rejectValue: string }
->("users/createUser", async (newUser, { rejectWithValue }) => {
+>("users/createUser", async (newUser, { rejectWithValue, dispatch }) => {
   try {
     const response = await axios.post("https://api.escuelajs.co/api/v1/users", {
       name: newUser.name,
@@ -30,7 +29,8 @@ export const createUser = createAsyncThunk<
       password: newUser.password,
       avatar: "https://picsum.photos/800",
     });
-    if (response.status !== 200) return [];
+    if (response.status !== 201) return [];
+    dispatch(getUsers());
     return response.data;
   } catch (e) {
     const error = e as Error;
@@ -42,7 +42,7 @@ export const updateUser = createAsyncThunk<
   UsersItem,
   UsersItem,
   { rejectValue: string }
->("users/updateUser", async (user, { rejectWithValue }) => {
+>("users/updateUser", async (user, { rejectWithValue, dispatch }) => {
   try {
     const response = await axios.put(
       `https://api.escuelajs.co/api/v1/users/${user.id}`,
@@ -52,7 +52,7 @@ export const updateUser = createAsyncThunk<
       }
     );
     if (response.status !== 200) return [];
-    console.log(response.data);
+    dispatch(getUsers());
     return response.data;
   } catch (e) {
     const error = e as Error;
@@ -65,13 +65,13 @@ export const deleteUser = createAsyncThunk<
   boolean,
   number | undefined,
   { rejectValue: string }
->("users/deleteUser", async (id, { rejectWithValue }) => {
+>("users/deleteUser", async (id, { rejectWithValue, dispatch }) => {
   try {
     const response = await axios.delete(
       `https://api.escuelajs.co/api/v1/users/${id}`
     );
     if (response.status !== 200) return [];
-
+    dispatch(getUsers());
     return response.data;
   } catch (e) {
     const error = e as Error;

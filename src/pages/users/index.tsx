@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import {
   Avatar,
   Button,
@@ -20,28 +20,40 @@ import {
 import { useAvatar } from "../../hook/useAvatar";
 import { UsersItem } from "../../types";
 import { useForm } from "antd/es/form/Form";
+import {
+  useSelectIsLoading,
+  useSelectIsError,
+  useSelectUsers,
+} from "../../store/selectors";
 
 const Users = () => {
-  const { users, isError, isLoading } = useAppSelector((state) => state.users);
+  // const users = useAppSelector((state) => state.users.users);
+  const users = useSelectUsers();
+  const isLoading = useSelectIsLoading();
+  // const isError = useSelectIsError();
   const [messageApi, contextHolder] = message.useMessage();
-  const [createOrEdit, setCreateOrEdit] = useState(false);
+  const [createOrEdit, setCreateOrEdit] = useState<boolean>(false);
   const [userId, setUserId] = useState<number | undefined>(undefined);
   const [form] = useForm();
   const dispatch = useAppDispatch();
+
   const [isModalOpen, setIsModalOpen] = useState<boolean | undefined>(false);
   const { beforeUpload, handleChange, imageUrl, uploadButton, setImageUrl } =
     useAvatar();
 
+  //opens the modal that creates a new user
   const showModal = () => {
     setIsModalOpen(true);
     setCreateOrEdit(true);
     form.resetFields();
   };
 
+  //close the modal
   const handleCancel = () => {
     setIsModalOpen(false);
   };
 
+  //btn for create a new user
   const onSubmit = (user: UsersItem) => {
     dispatch(createUser(user));
     messageApi.open({
@@ -74,29 +86,8 @@ const Users = () => {
     });
     setTimeout(() => {
       setIsModalOpen(false);
+      form.resetFields();
     }, 1000);
-    if (id !== undefined) {
-      if (id > 3) {
-        dispatch(updateUser({ ...formItems, id }));
-        messageApi.open({
-          type: "success",
-          content: "You have successfully updated the user",
-          duration: 2,
-        });
-        setTimeout(() => {
-          setIsModalOpen(false);
-        }, 1000);
-      } else {
-        messageApi.open({
-          type: "error",
-          content: "You can't edit this user",
-          duration: 2,
-        });
-        setTimeout(() => {
-          setIsModalOpen(false);
-        }, 1000);
-      }
-    }
   };
 
   const delUser = (id: number | undefined) => {
@@ -127,15 +118,9 @@ const Users = () => {
     });
   };
 
-  // useEffect(() => {
-  //   dispatch(getUsers());
-  // }, [dispatch]);
-  //   return;
-  // }, []);
-
-  // if (isError) {
-  //   return <h1>ERROR</h1>;
-  // }
+  useEffect(() => {
+    dispatch(getUsers());
+  }, []);
 
   return (
     <div className="flex flex-col gap-3">
@@ -152,8 +137,8 @@ const Users = () => {
           size="middle"
           bordered
           rowKey={(recond) => String(recond.id)}
-          loading={isLoading}
           pagination={{ showSizeChanger: false }}
+          loading={isLoading}
         >
           <Column dataIndex="id" key="id" title="№" ellipsis />
           <Column
@@ -295,5 +280,5 @@ const Users = () => {
       </Modal>
     </div>
   );
-
-export default Users 
+};
+export { Users };

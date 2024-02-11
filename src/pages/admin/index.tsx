@@ -52,6 +52,7 @@ const Admin = () => {
   const selectedLink = links.find(
     (link) => link.label.props.to === location.pathname
   );
+
   return (
     <div>
       <Layout className="h-screen">
@@ -88,12 +89,12 @@ const Admin = () => {
           <Content
             style={{
               margin: "24px 16px",
-              padding: '10px 15px',
+              padding: "10px 15px",
               minHeight: 280,
               background: colorBgContainer,
             }}
           >
-            <div >
+            <div>
               <Outlet />
             </div>
           </Content>
@@ -103,4 +104,4 @@ const Admin = () => {
   );
 };
 
-export default Admin;
+export { Admin };
